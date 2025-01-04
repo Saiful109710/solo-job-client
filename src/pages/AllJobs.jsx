@@ -5,16 +5,19 @@ import axios from 'axios'
 
 const AllJobs = () => {
   const [jobs,setJobs] = useState([])
-  console.log(jobs)
+  const [filter,setFilter] = useState('')
+  console.log(filter)
 
   useEffect(()=>{
-      fetchAllJobs()
-  },[])
 
-  const fetchAllJobs = async()=>{
-    const {data} =await axios.get(`${import.meta.env.VITE_API_URL}/jobs`)
-    setJobs(data)
-  }
+    const fetchAllJobs = async()=>{
+      const {data} =await axios.get(`${import.meta.env.VITE_API_URL}/all-jobs?filter=${filter}`)
+      setJobs(data)
+    }
+    fetchAllJobs()
+  },[filter])
+
+
   return (
     <div className='container px-6 py-10 mx-auto min-h-[calc(100vh-306px)] flex flex-col justify-between'>
       <div>
@@ -23,9 +26,10 @@ const AllJobs = () => {
             <select
               name='category'
               id='category'
+              onChange={(e)=>setFilter(e.target.value)}
               className='border p-4 rounded-lg'
             >
-              <option value=''>Filter By Category</option>
+              <option  value=''>Filter By Category</option>
               <option value='Web Development'>Web Development</option>
               <option value='Graphics Design'>Graphics Design</option>
               <option value='Digital Marketing'>Digital Marketing</option>
