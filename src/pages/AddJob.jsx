@@ -5,11 +5,25 @@ import { AuthContext } from "../providers/AuthProvider";
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
 
 const AddJob = () => {
   const [startDate, setStartDate] = useState(new Date());
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const navigate = useNavigate()
+  const {isPending,mutateAsync} = useMutation({
+    mutationFn:async jobData =>{
+      await axios.post(`${import.meta.env.VITE_API_URL}/add-job`,jobData)
+      
+    },
+    onSuccess:()=>{
+      console.log('data is save')
+    },
+    onError:()=>{
+      console.log(err)
+    }
+  })
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -39,7 +53,8 @@ const AddJob = () => {
     console.log(formData)
 
      try{
-        await axios.post(`${import.meta.env.VITE_API_URL}/add-job`,formData)
+
+        await mutateAsync(formData)
         form.reset()
         toast.success('data added successfully')
         navigate('/my-posted-jobs')
@@ -144,7 +159,7 @@ const AddJob = () => {
           </div>
           <div className="flex justify-end mt-6">
             <button className="disabled:cursor-not-allowed px-8 py-2.5 leading-5 text-white transition-colors duration-300 transhtmlForm bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
-              Save
+              {isPending ? 'Saving..' : 'Save'}
             </button>
           </div>
         </form>
