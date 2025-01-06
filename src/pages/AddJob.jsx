@@ -6,19 +6,23 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const AddJob = () => {
+  const queryClient = useQueryClient()
   const [startDate, setStartDate] = useState(new Date());
   const { user } = useAuth();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
   const {isPending,mutateAsync} = useMutation({
     mutationFn:async jobData =>{
-      await axios.post(`${import.meta.env.VITE_API_URL}/add-job`,jobData)
+      await axiosSecure.post(`/add-job`,jobData)
       
     },
     onSuccess:()=>{
       console.log('data is save')
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
     onError:()=>{
       console.log(err)
